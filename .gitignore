@@ -44,3 +44,4 @@ __pycache__/
 # Divers
 *.bak
 *.tmp
+*.old
