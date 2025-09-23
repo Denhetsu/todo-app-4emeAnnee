@@ -1,4 +1,4 @@
-name: "CI"
+name: CI
 
 on:
   push:
@@ -9,9 +9,24 @@ on:
       - dev
 
 jobs:
-  check-branch:
+  ci-base:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/dev'
+
     steps:
-      - name: Vérification branche
-        run: echo "La branche est bien 'dev'"
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer l'environnement (Python)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'   # tu peux mettre la version que tu utilises
+
+      - name: Installer les dépendances
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Lancer la vérification
+        run: |
+          pytest
