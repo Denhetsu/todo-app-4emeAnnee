@@ -1,2 +1,0 @@
-conflit footer
-conflit contact
