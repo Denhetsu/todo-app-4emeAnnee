@@ -1,4 +1,3 @@
-import pytest
 from app import add_task
 
 def test_add_task():

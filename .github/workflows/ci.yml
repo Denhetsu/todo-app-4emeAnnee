@@ -20,7 +20,7 @@ jobs:
       - name: Installer l'environnement (Python)
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'   # tu peux mettre la version que tu utilises
+          python-version: '3.11'
 
       - name: Installer les dépendances
         run: |
