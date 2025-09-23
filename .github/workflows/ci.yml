@@ -31,4 +31,4 @@ jobs:
       - name: Lancer la vérification
         run: |
           flake8 .    # linting
-          pytest      # tests unitaires
+          PYTHONPATH=. pytest     # tests unitaires
