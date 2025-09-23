@@ -32,3 +32,19 @@ jobs:
         run: |
           flake8 .    # linting
           PYTHONPATH=. pytest     # tests unitaires
+
+
+      - name: Notification Discord (succès)
+        if: ${{ success() }}
+        run: |
+          curl -H "Content-Type: application/json" \
+               -d "{\"content\": \"**CI réussie**\nWorkflow: \`${{ github.workflow }}\`\nBranche: \`${{ github.ref_name }}\`\nAuteur: ${{ github.actor }}\n[Lien du run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\"}" \
+               ${{ secrets.DISCORD_WEBHOOK }}
+
+
+      - name: Notification Discord (échec)
+        if: ${{ failure() }}
+        run: |
+          curl -H "Content-Type: application/json" \
+               -d "{\"content\": \"**CI échouée**\nWorkflow: \`${{ github.workflow }}\`\nBranche: \`${{ github.ref_name }}\`\nAuteur: ${{ github.actor }}\n[Lien du run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\"}" \
+               ${{ secrets.DISCORD_WEBHOOK }}
