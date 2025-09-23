@@ -33,48 +33,20 @@ jobs:
           flake8 .    # linting
           PYTHONPATH=. pytest     # tests unitaires
       
+
       - name: Notification Discord (succès)
         if: ${{ success() }}
         run: |
-          python - <<'EOF'
-          import os, requests, json
-          webhook = os.environ['DISCORD_WEBHOOK_URL']
-          data = {
-            "content": f"✅ **CI réussie**\n"
-                   f"Workflow: `{os.environ['GITHUB_WORKFLOW']}`\n"
-                   f"Branche: `{os.environ['GITHUB_REF_NAME']}`\n"
-                   f"Auteur: {os.environ['GITHUB_ACTOR']}\n"
-                   f"[Lien du run]({os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']})"
-          }
-
-          try:
-            requests.post(webhook, data=json.dumps(data), headers={"Content-Type": "application/json"})
-          except Exception as e:
-            print("Erreur notification Discord :", e)
-
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          curl -H "Content-Type: application/json" \
+               -d '{"content": "✅ **CI réussie**\nWorkflow: `${{ github.workflow }}`\nBranche: `${{ github.ref_name }}`\nAuteur: ${{ github.actor }}\n[Lien du run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"}' \
+               "${{ secrets.DISCORD_WEBHOOK_URL }}"
         continue-on-error: true
+
 
       - name: Notification Discord (échec)
         if: ${{ failure() }}
         run: |
-          python - <<'EOF'
-          import os, requests, json
-          webhook = os.environ['DISCORD_WEBHOOK_URL']
-          data = {
-            "content": f"❌ **CI échouée**\n"
-                   f"Workflow: `{os.environ['GITHUB_WORKFLOW']}`\n"
-                   f"Branche: `{os.environ['GITHUB_REF_NAME']}`\n"
-                   f"Auteur: {os.environ['GITHUB_ACTOR']}\n"
-                   f"[Lien du run]({os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']})"
-          }
-
-          try:
-            requests.post(webhook, data=json.dumps(data), headers={"Content-Type": "application/json"})
-          except Exception as e:
-            print("Erreur notification Discord :", e)
-
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          curl -H "Content-Type: application/json" \
+               -d '{"content": "❌ **CI échouée**\nWorkflow: `${{ github.workflow }}`\nBranche: `${{ github.ref_name }}`\nAuteur: ${{ github.actor }}\n[Lien du run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"}' \
+               "${{ secrets.DISCORD_WEBHOOK_URL }}"
         continue-on-error: true
