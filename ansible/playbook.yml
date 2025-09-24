@@ -1,0 +1,38 @@
+---
+- name: Déployer une application sur le conteneur Debian
+  hosts: debian_containers
+  become: yes   # Permet d'utiliser sudo
+  tasks:
+
+    - name: Mettre à jour les paquets
+      apt:
+        update_cache: yes
+
+    - name: Installer dépendances
+      apt:
+        name:
+          - git
+          - nginx   # tu peux remplacer par nodejs/npm si besoin
+        state: present
+
+    - name: Cloner le dépôt GitHub
+      git:
+        repo: "https://github.com/mon-utilisateur/mon-projet.git"
+        dest: /opt/mon-projet
+        version: main
+
+    - name: Copier les fichiers de l'application dans /var/www/html
+      copy:
+        src: /opt/mon-projet/
+        dest: /var/www/html/
+        owner: www-data
+        group: www-data
+        mode: '0755'
+      notify:
+        - Restart nginx
+
+  handlers:
+    - name: Restart nginx
+      service:
+        name: nginx
+        state: restarted
