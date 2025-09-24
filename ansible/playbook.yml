@@ -19,7 +19,7 @@
       git:
         repo: "https://github.com/mon-utilisateur/mon-projet.git"
         dest: /opt/mon-projet
-        version: main
+        version: dev
 
     - name: Copier les fichiers de l'application dans /var/www/html
       copy:
