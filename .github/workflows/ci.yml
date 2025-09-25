@@ -1,4 +1,4 @@
-name: "CI"
+name: CI
 
 on:
   push:
@@ -9,9 +9,44 @@ on:
       - dev
 
 jobs:
-  check-branch:
+  ci-base:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/dev'
+
     steps:
-      - name: Vérification branche
-        run: echo "La branche est bien 'dev'"
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer l'environnement (Python)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Installer les dépendances
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest flake8 requests
+
+      - name: Lancer la vérification
+        run: |
+          flake8 .    # linting
+          PYTHONPATH=. pytest     # tests unitaires
+      
+
+      - name: Notification Discord (succès)
+        if: ${{ success() }}
+        run: |
+          curl -H "Content-Type: application/json" \
+               -d '{"content": "✅ **CI réussie**\nWorkflow: `${{ github.workflow }}`\nBranche: `${{ github.ref_name }}`\nAuteur: ${{ github.actor }}\n[Lien du run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"}' \
+               "${{ secrets.DISCORD_WEBHOOK_URL }}"
+        continue-on-error: true
+
+
+      - name: Notification Discord (échec)
+        if: ${{ failure() }}
+        run: |
+          curl -H "Content-Type: application/json" \
+               -d '{"content": "❌ **CI échouée**\nWorkflow: `${{ github.workflow }}`\nBranche: `${{ github.ref_name }}`\nAuteur: ${{ github.actor }}\n[Lien du run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"}' \
+               "${{ secrets.DISCORD_WEBHOOK_URL }}"
+        continue-on-error: true
