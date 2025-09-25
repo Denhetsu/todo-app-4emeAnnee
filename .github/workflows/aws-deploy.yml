@@ -26,11 +26,10 @@ jobs:
           echo "${{ secrets.AWS_SSH_KEY }}" > aws_key.pem
           chmod 600 aws_key.pem
 
-      # 4. Lancer le playbook Ansible
       - name: Run Ansible Playbook
         run: |
-          ansible-playbook -i .\aws_ansible\inventory_aws.ini .\aws_ansible\deploy.yml \
-            --key-file aws_key.pem
+          ansible-playbook -i aws_ansible/inventory_aws.ini aws_ansible/deploy.yml \
+          --key-file aws_key.pem
 
       # 5. Supprimer la clé après déploiement
       - name: Remove SSH key
