@@ -1,5 +1,5 @@
 ---
-- name: Déploiement de l'app web
+- name: Déploiement de l app web
   hosts: webserver
   become: yes
   tasks:
@@ -7,7 +7,7 @@
       apt:
         update_cache: yes
 
-    - name: Installation des dépendances
+    - name: Installation des dependances
       apt:
         name:
           - git
@@ -16,18 +16,11 @@
           - python3-pip
         state: present
 
-    - name: S'assurer que nginx est démarré et activé
-      service:
-        name: nginx
-        state: started
-        enabled: yes
-
-    - name: Cloner le repo git de l'app
+    - name: Cloner le repo git de l app
       git:
         repo: "https://github.com/Denhetsu/todo-app-4emeAnnee.git"
         dest: /var/www/app
         version: dev
-        force: yes
 
     - name: Configuration Nginx
       copy:
@@ -36,19 +29,19 @@
           server {
               listen 80;
               root /var/www/app;
-              index index.html;
+              index contact.html;
               server_name _;
           }
       notify: Restart nginx
 
-    - name: Activer la config Nginx
+    - name: Activation de la config Nginx
       file:
         src: /etc/nginx/sites-available/app
         dest: /etc/nginx/sites-enabled/app
         state: link
         force: yes
 
-    - name: Désactiver le site par défaut de Nginx
+    - name: Desactivation du site par défaut de Nginx
       file:
         path: /etc/nginx/sites-enabled/default
         state: absent
