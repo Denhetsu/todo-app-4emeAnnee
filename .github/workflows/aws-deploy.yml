@@ -1,0 +1,37 @@
+name: AWS Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Récupérer ton code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Installer Ansible
+      - name: Install Ansible
+        run: |
+          sudo apt update
+          sudo apt install -y ansible
+
+      # 3. Créer la clé privée à partir du secret GitHub
+      - name: Create SSH key
+        run: |
+          echo "${{ secrets.AWS_SSH_KEY }}" > aws_key.pem
+          chmod 600 aws_key.pem
+
+      # 4. Lancer le playbook Ansible
+      - name: Run Ansible Playbook
+        run: |
+          ansible-playbook -i inventory_aws.ini deploy.yml \
+            --key-file aws_key.pem
+
+      # 5. Supprimer la clé après déploiement
+      - name: Remove SSH key
+        run: rm -f aws_key.pem
