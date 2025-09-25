@@ -29,7 +29,7 @@ jobs:
       # 4. Lancer le playbook Ansible
       - name: Run Ansible Playbook
         run: |
-          ansible-playbook -i inventory_aws.ini deploy.yml \
+          ansible-playbook -i .\aws_ansible\inventory_aws.ini .\aws_ansible\deploy.yml \
             --key-file aws_key.pem
 
       # 5. Supprimer la clé après déploiement
