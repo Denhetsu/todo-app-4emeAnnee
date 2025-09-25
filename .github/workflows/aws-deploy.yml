@@ -1,4 +1,4 @@
-name: AWS Deploy
+name: Deploy ToDoApp to AWS
 
 on:
   push:
@@ -7,30 +7,23 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
-      # 1. Récupérer ton code
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. Installer Ansible
-      - name: Install Ansible
-        run: |
-          sudo apt update
-          sudo apt install -y ansible
+      - name: Installer Ansible
+        run: sudo apt update && sudo apt install -y ansible sshpass
 
-      # 3. Créer la clé privée à partir du secret GitHub
-      - name: Create SSH key
+      - name: Create private key file
         run: |
-          echo "${{ secrets.AWS_SSH_KEY }}" > aws_key.pem
-          chmod 600 aws_key.pem
+          echo "${{ secrets.AWS_SSH_KEY }}" > aws_app_todo.pem
+          chmod 600 aws_app_todo.pem
 
-      - name: Run Ansible Playbook
+      - name: Déployment with Ansible
         run: |
-          ansible-playbook -i aws_ansible/inventory_aws.ini aws_ansible/deploy.yml \
-          --key-file aws_key.pem
+          ansible-playbook -i ansible/inventory_aws.ini ansible/deploy.yml
 
-      # 5. Supprimer la clé après déploiement
-      - name: Remove SSH key
-        run: rm -f aws_key.pem
+      - name: Remove key file
+        run: rm -f aws_app_todo.pem
